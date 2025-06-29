@@ -4,12 +4,17 @@ import { expect, describe, it } from 'vitest'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { AuthenticateUseCase } from './authenticate'
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
+import { beforeEach } from 'node:test'
+
+let userRepository: InMemoryUsersRepository
+let sut: AuthenticateUseCase
 
 describe('Authenticate Use Case', () => {
+  beforeEach(() => {
+    userRepository = new InMemoryUsersRepository()
+    sut = new AuthenticateUseCase(userRepository) // sut - system under test
+  })
   it('should be able to authenticate a user', async () => {
-    const userRepository = new InMemoryUsersRepository()
-    const sut = new AuthenticateUseCase(userRepository) // sut - system under test
-
     await userRepository.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
@@ -25,9 +30,6 @@ describe('Authenticate Use Case', () => {
   })
 
   it('should not be able to authenticate with wrong e-mail', async () => {
-    const userRepository = new InMemoryUsersRepository()
-    const sut = new AuthenticateUseCase(userRepository) // sut - system under test
-
     expect(() =>
       sut.execute({
         email: 'john.doe@example.com',
@@ -37,9 +39,6 @@ describe('Authenticate Use Case', () => {
   })
 
   it('should not be able to authenticate with wrong password', async () => {
-    const userRepository = new InMemoryUsersRepository()
-    const sut = new AuthenticateUseCase(userRepository) // sut - system under test
-
     expect(() =>
       sut.execute({
         email: 'john.doe@example.com',
